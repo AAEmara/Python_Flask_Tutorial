@@ -1,0 +1,4 @@
+#!/usr/bin/bash
+# Installing flask, a python library.
+sudo apt update
+sudo pip install flask
