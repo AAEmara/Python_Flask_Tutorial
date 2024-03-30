@@ -57,6 +57,47 @@ def create_task():
     return (jsonify({'task': task}), 201)
 
 
+@app.route('/todo/api/v1.0/tasks/<int:task_id>', methods=['PUT'])
+def update_task(task_id):
+    """Updates the content of a `task` resource."""
+    if len(tasks):
+        for task in tasks:
+            if task['id'] == task_id:
+                task_retrieved = task
+    elif not len(tasks):
+        abort(404)
+
+    if not request.json:
+        abort(400)
+    if 'title' in request.json and type(request.json['title']) is not unicode:
+        abort(400)
+    if ('description' in request.json and
+            type(request.json['description']) is not unicode):
+        abort(400)
+    if 'done' in request.json and type(request.json['done']) is not bool:
+        abort(400)
+
+    task_retrieved['title'] = request.json.get('title',
+                                               task_retrieved['title'])
+    task_retrieved['description'] = request.json.get(
+                                               'description',
+                                               task_retrieved['description'])
+    task_retrieved['done'] = request.json.get('done',
+                                              task_retrieved['done'])
+    return jsonify({'task': task_retrieved})
+
+
+@app.route('/todo/api/v1.0/tasks/<int:task_id>', methods=['DELETE'])
+def delete_task(task_id):
+    """Deleting the content of a certain `task` resource for a given id."""
+    if len(tasks):
+        for task in tasks:
+            if task['id'] == task_id:
+                tasks.remove(task)
+                return (jsonify({'result': True}))
+    abort(404)
+
+
 @app.errorhandler(404)
 def not_found(error):
     """Returns a 404 error response in a JSON format."""
