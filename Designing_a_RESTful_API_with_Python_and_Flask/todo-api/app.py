@@ -3,7 +3,7 @@
 
 
 from flask import Flask, jsonify, abort, make_response
-
+from flask import request
 
 app = Flask(__name__)
 
@@ -32,7 +32,7 @@ def get_tasks():
 
 @app.route('/todo/api/v1.0/tasks/<int:task_id>', methods=['GET'])
 def get_task(task_id):
-    """Retrieving the `tasks` resource given by a specific task_id value."""
+    """Retrieving the `task` resource given by a specific task_id value."""
     if len(tasks):
         for task in tasks:
             if task['id'] == task_id:
@@ -40,6 +40,21 @@ def get_task(task_id):
                 return jsonify({'task': task_retrieved})
 
     abort(404)
+
+
+@app.route('/todo/api/v1.0/tasks', methods=['POST'])
+def create_task():
+    """Creates a new `task` resource through a request from the user."""
+    if not request.json or 'title' not in request.json:
+        abort(400)
+    task = {
+        'id': tasks[-1]['id'] + 1,
+        'title': request.json['title'],
+        'description': request.json.get('description', ""),
+        'done': False
+    }
+    tasks.append(task)
+    return (jsonify({'task': task}), 201)
 
 
 @app.errorhandler(404)
