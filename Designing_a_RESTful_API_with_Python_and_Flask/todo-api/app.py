@@ -2,7 +2,7 @@
 """Creating a simple web application."""
 
 
-from flask import Flask, jsonify, abort
+from flask import Flask, jsonify, abort, make_response
 
 
 app = Flask(__name__)
@@ -40,6 +40,12 @@ def get_task(task_id):
                 return jsonify({'task': task_retrieved})
 
     abort(404)
+
+
+@app.errorhandler(404)
+def not_found(error):
+    """Returns a 404 error response in a JSON format."""
+    return make_response(jsonify({'error': 'Not found'}), 404)
 
 
 if __name__ == "__main__":
