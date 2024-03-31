@@ -124,8 +124,8 @@ def not_found(error):
 
 @auth.error_handler
 def unauthorized():
-    """Returns a 401 error message for an unauthorized user in JSON Format."""
-    return make_response(jsonify({'error': 'Unauthorized access'}), 401)
+    """Returns a 403 error message for an unauthorized user in JSON Format."""
+    return make_response(jsonify({'error': 'Unauthorized access'}), 403)
 
 
 # Helper Functions.
