@@ -5,10 +5,11 @@
 from flask import Flask, jsonify, abort, make_response
 from flask import request
 from flask import url_for
+from flask_httpauth import HTTPBasicAuth
 
 
 app = Flask(__name__)
-
+auth = HTTPBasicAuth()
 
 tasks = [
     {
@@ -26,7 +27,9 @@ tasks = [
 ]
 
 
+# Routing by Flask.
 @app.route('/todo/api/v1.0/tasks', methods=['GET'])
+@auth.login_required
 def get_tasks():
     """Routing to todo web service to retrieve the `tasks` resource."""
     retrieved_tasks = []
@@ -103,12 +106,29 @@ def delete_task(task_id):
     abort(404)
 
 
+# Authentication.
+@auth.get_password
+def get_password(username):
+    """Obtains the password for a given user."""
+    if username == 'emara':
+        return 'python'
+    return None
+
+
+# Handling Errors.
 @app.errorhandler(404)
 def not_found(error):
     """Returns a 404 error response in a JSON format."""
     return make_response(jsonify({'error': 'Not found'}), 404)
 
 
+@auth.error_handler
+def unauthorized():
+    """Returns a 401 error message for an unauthorized user in JSON Format."""
+    return make_response(jsonify({'error': 'Unauthorized access'}), 401)
+
+
+# Helper Functions.
 def make_public_task(task):
     """A helper functionn to substitute the `id` key with a `uri` field."""
     new_task = {}
